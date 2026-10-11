@@ -49,10 +49,11 @@ const BackendService = {
     OpenAuthorizationWall : async () => {
         window.open(LEAD_CONNECTOR_OAUTH_URL, '_blank');
     },
-    ValidateAuthCode : async (code : string ) => {
+    ValidateAuthCode : async (code : string, region? : string | null ) => {
         return await wpFetch(
             getApiURL("wp_validate_oauth", {
-                code
+                code,
+                lc_region: region ?? undefined,
             })
         );
     },

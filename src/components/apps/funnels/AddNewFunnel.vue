@@ -23,6 +23,7 @@ import type {
 import { LC_PROD_BASE_URL } from "@/constants";
 import { LinkExternal01Icon, PlusIcon, PlusSquareIcon } from "@/icons";
 import { ensureHttps } from "@/helper";
+import { config } from "@/config";
 
 const emit = defineEmits(["fetch-funnels", "modal-close"]);
 const lcConnectionMethod = inject("lcConnectionMethod") as string;
@@ -311,7 +312,12 @@ watch(
         ?.pages?.[0];
     }
     if (stepPage) {
-      localState.previewURL = `${ensureHttps(lcHost as string)}/preview/${stepPage}`;
+      // AU funnels are served from the AU preview host; the app domain redirects /preview to the default region.
+      const previewHost =
+        config.LEAD_CONNECTOR_DATA_REGION === "au" && config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
+          ? config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
+          : ensureHttps(lcHost as string);
+      localState.previewURL = `${previewHost}/preview/${stepPage}`;
     } else {
       localState.previewURL = "";
     }
