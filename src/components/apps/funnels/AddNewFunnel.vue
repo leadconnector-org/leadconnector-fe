@@ -299,17 +299,14 @@ watch(
     if (!selectedStepId) return;
 
     let stepPage = "";
-    // AU accounts without a white-label domain use the AU preview host.
-    const regionalHost =
-      config.LEAD_CONNECTOR_DATA_REGION === "au"
-        ? config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
-        : "";
+    // White-label domain first, then the regional funnel preview host from the services API.
+    const funnelPreviewHost = config.LEAD_CONNECTOR_FUNNEL_PREVIEW_URL;
     let lcHost =
-      lcOptions.white_label_url || regionalHost || lcAdminSettings.baseURL;
+      lcOptions.white_label_url || funnelPreviewHost || lcAdminSettings.baseURL;
 
     if (lcConnectionMethod == "api_key") {
       stepPage = selectedStepId;
-      lcHost = lcOptions.white_label_url || regionalHost || LC_PROD_BASE_URL;
+      lcHost = lcOptions.white_label_url || funnelPreviewHost || LC_PROD_BASE_URL;
     } else {
       const selectedFunnel = localState.funnelsList.find(
         (funnel) => funnel._id == localState.selectedFunnelId,
