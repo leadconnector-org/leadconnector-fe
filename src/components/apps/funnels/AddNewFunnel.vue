@@ -299,11 +299,17 @@ watch(
     if (!selectedStepId) return;
 
     let stepPage = "";
-    let lcHost = lcOptions.white_label_url || lcAdminSettings.baseURL;
+    // AU accounts without a white-label domain use the AU preview host.
+    const regionalHost =
+      config.LEAD_CONNECTOR_DATA_REGION === "au"
+        ? config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
+        : "";
+    let lcHost =
+      lcOptions.white_label_url || regionalHost || lcAdminSettings.baseURL;
 
     if (lcConnectionMethod == "api_key") {
       stepPage = selectedStepId;
-      lcHost = lcOptions.white_label_url || LC_PROD_BASE_URL;
+      lcHost = lcOptions.white_label_url || regionalHost || LC_PROD_BASE_URL;
     } else {
       const selectedFunnel = localState.funnelsList.find(
         (funnel) => funnel._id == localState.selectedFunnelId,
@@ -312,12 +318,7 @@ watch(
         ?.pages?.[0];
     }
     if (stepPage) {
-      // AU funnels are served from the AU preview host; the app domain redirects /preview to the default region.
-      const previewHost =
-        config.LEAD_CONNECTOR_DATA_REGION === "au" && config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
-          ? config.LEAD_CONNECTOR_PREVIEW_BASE_URL_AU
-          : ensureHttps(lcHost as string);
-      localState.previewURL = `${previewHost}/preview/${stepPage}`;
+      localState.previewURL = `${ensureHttps(lcHost as string)}/preview/${stepPage}`;
     } else {
       localState.previewURL = "";
     }
