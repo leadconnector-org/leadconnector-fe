@@ -23,6 +23,7 @@ import type {
 import { LC_PROD_BASE_URL } from "@/constants";
 import { LinkExternal01Icon, PlusIcon, PlusSquareIcon } from "@/icons";
 import { ensureHttps } from "@/helper";
+import { config } from "@/config";
 
 const emit = defineEmits(["fetch-funnels", "modal-close"]);
 const lcConnectionMethod = inject("lcConnectionMethod") as string;
@@ -298,11 +299,14 @@ watch(
     if (!selectedStepId) return;
 
     let stepPage = "";
-    let lcHost = lcOptions.white_label_url || lcAdminSettings.baseURL;
+    // White-label domain first, then the regional funnel preview host from the services API.
+    const funnelPreviewHost = config.LEAD_CONNECTOR_FUNNEL_PREVIEW_URL;
+    let lcHost =
+      lcOptions.white_label_url || funnelPreviewHost || lcAdminSettings.baseURL;
 
     if (lcConnectionMethod == "api_key") {
       stepPage = selectedStepId;
-      lcHost = lcOptions.white_label_url || LC_PROD_BASE_URL;
+      lcHost = lcOptions.white_label_url || funnelPreviewHost || LC_PROD_BASE_URL;
     } else {
       const selectedFunnel = localState.funnelsList.find(
         (funnel) => funnel._id == localState.selectedFunnelId,
