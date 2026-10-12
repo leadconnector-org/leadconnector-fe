@@ -24,7 +24,7 @@ const checkForOAuthAuthorization = async () => {
   const authCode = getOAuthCodeFromUrl(urlParams);
   if (authCode) {
     isAuthorizing.value = true;
-    await BackendService.ValidateAuthCode(authCode, urlParams.get("lc_region"));
+    await BackendService.ValidateAuthCode(authCode);
     isAuthorizing.value = false;
   }
 };
